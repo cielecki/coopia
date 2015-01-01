@@ -29,7 +29,13 @@
         </div>
         <div class="col-md-6">
             <img src="maps/aftermath.jpg" style="width: 500px;"></img>
-            <div ia-map="map"></div>
+            <div class="aid-map">
+                <div style="position: absolute;" ia-map="map"></div>
+
+                <div ng-repeat="obj in map.objects" class="aid-los-marker aid-unit-{{obj.typeId}}" style="left: {{obj.screenX()}}px; top:{{obj.screenY()}}px;" aid-map-drag="dragCallbackForObj(obj)">
+                    <div class="aid-los-marker-inner" style="background-image: url(images/{{obj.img}});"></div>
+                </div>
+            </div>
         </div>
 
     </div>

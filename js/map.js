@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////////////
 // Direction
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,25 +34,91 @@ var TERRAIN_IMPASSIBLE = {cellCssClass: 'aid-map-cell-impassible',canMove: false
 var TERRAIN_BLOCKED = {cellCssClass: 'aid-map-cell-blocked', canMove: false, blocksLOS: true, canMoveIfMobile: true, entryCost: 1, edgeCss:'1px solid #F00'};
 var TERRAIN_DIFFICULT = {cellCssClass: 'aid-map-cell-difficult', canMove: true, blocksLOS: false, canMoveIfMobile: true, entryCost: 2, edgeCss:'1px solid #00F'};
 
-function IAMapObject() {
-    this.x = 0;
-    this.y = 0;
-    this.name = 'Door';
-    this.typeId = 'DOOR';
-    this.figure = false;
-    this.cellObject = false;
-    this.edgeObject = true;
-    this.blocksLOS = true;
-    this.hardBlocksLOS = false;
-    this.img = '';
-}
-
 function IAMap() {
     var map = this;
+
+    this.createObject = function (objectType) {
+        var obj = {};
+
+        obj.map = map;
+        obj.x = 0; //x, y is always the bottom left corner.
+        obj.y = 0;
+        obj.width = 1; //if width or height is 0 that means it's a DOOR like object sitting on the edge.
+        obj.height = 1;
+        obj.name = 'Door';
+        obj.typeId = 'DOOR';
+        obj.isFigure = false;
+        obj.blocksLOS = true;
+        obj.hardBlocksLOS = false;
+        obj.isFocused = false;
+        obj.isBleeding = false;
+        obj.isStunned = false;
+        obj.img = '';
+
+        obj.screenX = function () { return CELL_WIDTH * this.x; };
+        obj.screenY = function () { return CELL_HEIGHT * (map.height - this.y); };
+
+        for(var k in objectType) obj[k] = objectType[k];
+
+        return obj;
+    };
+
+    function visitCellsAndEdgesOfAnObject(object, visitor) {
+        for (var x = object.x; x <= object.x + object.width; x++) {
+            for (var y = object.y; y <= object.y + object.height; y++) {
+
+                // cells
+                if (x < object.x + object.width && y < object.y + object.height)
+                    visitor(map.getCell(x, y));
+
+                //this also handles door like objects that sit only on the edge
+                if (((object.x < x  && x < object.x + object.width) || object.width === 0) &&
+                    (y + 1 <= object.y + object.height)) {
+                    visitor(map.getCell(x, y).getEdge(DIR_TOP)); // internal edges
+                }
+
+                //this also handles door like objects that sit only on the edge
+                if (((object.y < y  && y < object.y + object.height) || object.height === 0) &&
+                    (x + 1 <= object.x + object.width)) {
+                    visitor(map.getCell(x, y).getEdge(DIR_RIGHT)); // internal edges
+                }
+            }
+        }
+    }
+
+    this.integrityCheck = function() {
+        //check if objects are properly assigned to grid
+    };
+
+    this.addObject = function(object) {
+        this.objects.push(object);
+        visitCellsAndEdgesOfAnObject(object, function(edgeOrCell) {
+            edgeOrCell.objects.push(object);
+        });
+    };
+
+    this.removeObject = function(object) {
+        //Warning: object x and y must not change between addObject and removeObject calls!
+
+        removeElementFromArray(this.objects, object);
+        visitCellsAndEdgesOfAnObject(object, function(edgeOrCell) {
+            removeElementFromArray(edgeOrCell.objects, object);
+        });
+    };
+
+    this.relocateObject = function(object, newX, newY) {
+        //The only true way of moving object between two places on the map
+
+        this.removeObject(object);
+        object.x = newX;
+        object.y = newY;
+        this.addObject(object);
+    };
 
     this.init = function (width, height) {
         this.width = width;
         this.height = height;
+        this.objects = [];
 
         function createUnconnectedCell(x, y) {
             return {

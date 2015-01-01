@@ -1,14 +1,14 @@
 <div ng-show="phase == 'campaign_setup'">
     <div class="flow-buttons">
         <button class="btn btn-default" ng-click="$root.phase = 'intro'">< back</button>
-        <button class="btn btn-default" ng-click="setupMission('aftermath')" ng-disabled="numHeroes < 2 || numHeroes > 4">Start the first mission.</button>
+        <button class="btn btn-primary" ng-click="setupMission('aftermath')" ng-disabled="numHeroes < 2 || numHeroes > 4">Start the first mission.</button>
     </div>
 
     <h1>Campaign setup</h1>
     <hr/>
 
     <h4>Choose up to 4 heroes</h4>
-    <div ng-repeat="hero in availableHeroes" ><label><input type="checkbox" ng-model="selectedHeroes[hero.name]"/> <img style="width: 16px; height: 16px;" src="images/{{hero.img}}" /> {{hero.name}}</label></div>
+    <div ng-repeat="hero in availableHeroes" ><label><input type="checkbox" ng-model="selectedHeroes[hero.typeId]"/> <img style="width: 16px; height: 16px;" ng-src="images/{{hero.img}}" /> {{hero.name}}</label></div>
     
     <br/>
 

@@ -82,23 +82,15 @@ h1, h2, h3, h4, h5 {
     background-position: 50% 50% ;
 }
 
-.aid-unit-stormtrooper .aid-los-marker-inner {
-    background-image: url(images/stormtrooper.png); 
-}
-
-.aid-unit-jyn .aid-los-marker-inner {
-    background-image: url(images/jyn.png);
-}
-
 .aid-unit-jyn.aid-los-marker {
     background-color: #F33;
 }
 
-.aid-los-marker-inner:hover {
+.aid-los-marker:hover {
     cursor: -webkit-grab;
     cursor: -moz-grab;
 }
-.aid-los-marker-inner:active {
+.aid-los-marker:active {
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
     z-index: 2;

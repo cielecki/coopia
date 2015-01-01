@@ -13,15 +13,15 @@ angular.module('imperial', ['ui.bootstrap'])
 	};
 
 	$rootScope.availableHeroes = [
-		{id: 'gideon_argus', img:'gideon_argus.png', name:'Gideon Argus'},
-		{id: 'gaarkhan', img:'gaarkhan.jpg', name:'Gaarkhan'},
-		{id: 'jyn_odan', img:'jyn_odan.png', name:'Jyn Odan'},
-		{id: 'fenn_signis', img:'fenn_signis.png', name:'Fenn Signis'},
-		{id: 'diala_passil', img:'diala_passil.jpg', name:'Diala Passil'},
-		{id: 'mak_eshkarey', img:'mak_eshkarey.jpg', name:'Mak Eshka\'rey'}
+		{typeId: 'gideon_argus', img:'gideon_argus.png', name:'Gideon Argus'},
+		{typeId: 'gaarkhan', img:'gaarkhan.jpg', name:'Gaarkhan'},
+		{typeId: 'jyn_odan', img:'jyn_odan.png', name:'Jyn Odan'},
+		{typeId: 'fenn_signis', img:'fenn_signis.png', name:'Fenn Signis'},
+		{typeId: 'diala_passil', img:'diala_passil.jpg', name:'Diala Passil'},
+		{typeId: 'mak_eshkarey', img:'mak_eshkarey.jpg', name:'Mak Eshka\'rey'}
 	];
 
-	$rootScope.selectedHeroes = {};
+	$rootScope.selectedHeroes = {gideon_argus: true, gaarkhan: true};
 
 	$scope.$watch('selectedHeroes', function () {
 		var i = 0;
@@ -40,9 +40,88 @@ angular.module('imperial', ['ui.bootstrap'])
 		$http.get('/maps/' + missionName + '.map').success(function(data, status, headers, config) {
 			var map = new IAMap(20, 20);
 			map.load(data);
+
+			var jyn = {typeId: "jyn", x: 3, y: 4, img: 'jyn_odan.png'};
+			var stormtrooper1 = {typeId: "stormtrooper", x:2, y:5, img: 'stormtrooper.png'};
+			var stormtrooper2 = {typeId: "stormtrooper", x:1, y:5, img: 'stormtrooper.png'};
+			var stormtrooper3= {typeId: "stormtrooper", x:3, y:5, img: 'stormtrooper.png'};
+			var units = [jyn, stormtrooper1, stormtrooper2, stormtrooper3];
+
+			for (var ui = 0; ui < units.length; ui++) {
+				var figure = map.createObject(units[ui]);
+				map.addObject(figure);
+			}
+
 			$rootScope.map = map;
 		});
 	};
+})
+
+.directive('aidMapDrag', function() {
+	console.log('draggeroz');
+	return {
+		restrict: 'A',
+		link: function (scope, element, attrs) {
+			console.log('draggeroz2');
+			var placeCalback = scope.$eval(attrs.aidMapDrag);
+
+            var $document = $(document),
+                $this = $(element),
+                active,
+                startX,
+                startY,
+                orgOffset;
+
+            var map0X, map0Y;
+            
+            $this.on('mousedown touchstart', function(e) {
+                map0X = $this.offset().left - $this.position().left;
+                map0Y = $this.offset().top - $this.position().top;
+
+                active = true;
+                startX = e.originalEvent.pageX - $this.offset().left;
+                startY = e.originalEvent.pageY - $this.offset().top;
+                orgOffset = $this.offset();
+                
+                if ('mousedown' == e.type)
+                    click = $this;
+                                    
+                if ('touchstart' == e.type)
+                    touch = $this;
+                                    
+                if (window.mozInnerScreenX === null)
+                    return false;
+            });
+            
+            $document.on('mousemove touchmove', function(e) {
+                if ('mousemove' == e.type && active)
+                    click.offset({
+                        left: e.originalEvent.pageX - startX,
+                        top: e.originalEvent.pageY - startY
+                    });
+                
+                if ('touchmove' == e.type && active)
+                    touch.offset({
+                        left: e.originalEvent.pageX - startX,
+                        top: e.originalEvent.pageY - startY
+                    });
+            }).on('mouseup touchend', function(e) {
+                if ('mouseup' == e.type && active) {
+					click.offset(orgOffset); //needed if we don't change anything in scope
+                    placeCalback(click, e.originalEvent.pageX - startX - map0X, e.originalEvent.pageY - startY - map0Y);
+                    scope.$digest();
+                }
+                
+                if ('touchend' == e.type && active) {
+					touch.offset(orgOffset); //needed if we don't change anything in scope
+                    placeCalback(touch, e.originalEvent.pageX - startX - map0X, e.originalEvent.pageY - startY - map0Y);
+                    scope.$digest();
+                }
+
+                active = false;
+            });
+        }
+    };
 })
 
 .directive('iaMap', function() {
@@ -56,12 +135,22 @@ angular.module('imperial', ['ui.bootstrap'])
 				if (!map) {
 					return;
 				}
+
+				scope.dragCallbackForObj = function(obj) {
+					console.log('dragcb');
+					return function (domElement, x , y) {
+						console.log('dragcb2');
+						map.relocateObject(obj, Math.round(x / CELL_WIDTH), Math.round(map.height - y / CELL_HEIGHT));
+						//checkLos();
+					};
+				};
 				
 				console.log('map', map, map.height);
 
 				var mapDiv = $('<div class="aid-map">');
 				mapDiv.css('height', CELL_HEIGHT * map.height);
 
+				/*
 				function addClicker(cellDiv, x, y) {
 					cellDiv.click(function() {
 						for (var lx = 0; lx < map.width; lx++) {
@@ -76,7 +165,7 @@ angular.module('imperial', ['ui.bootstrap'])
 							}
 						}
 					});
-				}
+				}*/
 
 				for (var y = 0; y < map.height; y++) {
 					var row = $('<div class="aid-map-row">');
@@ -98,7 +187,7 @@ angular.module('imperial', ['ui.bootstrap'])
 							}
 						}
 						
-						addClicker(cellDiv, x, y);
+						//addClicker(cellDiv, x, y);
 						row.append(cellDiv);
 						cell.domElement = cellDiv;
 					}
@@ -106,44 +195,34 @@ angular.module('imperial', ['ui.bootstrap'])
 					mapDiv.append(row);
 				}
 
-				var jyn = {type: "jyn", x: 3, y: 4};
-				var stormtrooper = {type: "stormtrooper", x:2, y:5};
-				var units = [jyn, stormtrooper];
-
+				/*
 				function checkLos() {
 					stormtrooper.domElement.removeClass('aid-visible');
 
 					if (map.hasLOS(jyn.x, jyn.y, stormtrooper.x, stormtrooper.y)) {
 						stormtrooper.domElement.addClass('aid-visible');
 					}
-				}
+				}*/
 
+				/*
 				function addUnit(unit) {
 					var unitDiv = $('<div class="aid-los-marker"><div class="aid-los-marker-inner"></div></div>');
 					unitDiv.addClass('aid-unit-' + unit.type);
 					unitDiv.mapPosition(map, unit.x, unit.y);
 
-					unitDiv.dragmove(function (domElement, x , y) {
-						unit.x = Math.round(x / CELL_WIDTH);
-						unit.y = Math.round(map.height - y / CELL_HEIGHT);
-						domElement.mapPosition(map, unit.x, unit.y);
-						checkLos();
-					});
-
+					
 					unit.domElement = unitDiv;
 					mapDiv.append(unitDiv);
-				}
+				}*/
 
-				for (var ui = 0; ui < units.length; ui++) {
-					var unit = units[ui];
-					addUnit(unit);
-				}
+
 
 				element.append(mapDiv);
-				console.log(element);
 			}
 
-			scope.$watch(attrs.iaMap, updateMap);
+
+
+			scope.$watch(attrs.iaMap, updateMap, false);
 		}
 	};
 });

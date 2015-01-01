@@ -38,3 +38,11 @@ function rollDie(sides) {
     if(!sides) sides = 6;
     return 1 + Math.floor(Math.random() * sides);
 }
+
+//Removes an element from an array
+function removeElementFromArray(arr, el) {
+    var index = arr.indexOf(el);
+    if (index > -1) {
+        arr.splice(index, 1);
+    }
+}
