@@ -1,0 +1,22 @@
+<div ng-show="phase == 'campaign_setup'">
+    <div class="flow-buttons">
+        <button class="btn btn-default" ng-click="$root.phase = 'intro'">< back</button>
+        <button class="btn btn-default" ng-click="setupMission('aftermath')" ng-disabled="numHeroes < 2 || numHeroes > 4">Start the first mission.</button>
+    </div>
+
+    <h1>Campaign setup</h1>
+    <hr/>
+
+    <h4>Choose up to 4 heroes</h4>
+    <div ng-repeat="hero in availableHeroes" ><label><input type="checkbox" ng-model="selectedHeroes[hero.name]"/> <img style="width: 16px; height: 16px;" src="images/{{hero.img}}" /> {{hero.name}}</label></div>
+    
+    <br/>
+
+    <p>Each Rebel player chooses one Hero sheet and takes that hero’s matching Class deck and hero figure. Then each Rebel player retrieves the basic Item cards (the cards without an XP cost) from his Class deck and places them faceup on the table in front of him</p>
+
+    <p ng-show="numHeroes == 2">2-Hero Game: Each hero receives a “Legendary” Reward card.</p>
+
+    <p ng-show="numHeroes == 3">3-Hero Game: Each hero receives a “Heroic” Reward card.</p>
+
+    <hr/>    
+</div>
