@@ -37,7 +37,7 @@ var TERRAIN_DIFFICULT = {cellCssClass: 'aid-map-cell-difficult', canMove: true, 
 function IAMap() {
     var map = this;
 
-    this.createObject = function (objectType) {
+    this.createObject = function (objectType, instanceInfo) {
         var obj = {};
 
         obj.map = map;
@@ -58,7 +58,14 @@ function IAMap() {
         obj.screenX = function () { return CELL_WIDTH * this.x; };
         obj.screenY = function () { return CELL_HEIGHT * (map.height - this.y); };
 
-        for(var k in objectType) obj[k] = objectType[k];
+        if (objectType)
+            for (var k in objectType)
+                obj[k] = objectType[k];
+
+
+        if (instanceInfo)
+            for (var j in instanceInfo)
+                obj[j] = instanceInfo[j];
 
         return obj;
     };

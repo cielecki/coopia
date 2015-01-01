@@ -51,9 +51,16 @@ angular.module('imperial', ['ui.bootstrap'])
 				}
 			});
 
-			for (var ui = 0; ui < 9; ui++) {
-				map.placeObject(map.createObject({typeId: "stormtrooper", x:3, y:3, img: 'stormtrooper.png', isFigure: true}));
-			}
+			var FIGURE_STORM_TROOPER    = {typeId: "stormtrooper", img: 'stormtrooper.png', isFigure: true};
+			var FIGURE_PROBE_DROID      = {typeId: "probe", img: 'probe.png', isFigure: true};
+			var FIGURE_IMPERIAL_OFFICER = {typeId: "officer", img: 'officer.png', isFigure: true};
+
+			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 0, y: 2}));
+			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 1, y: 4}));
+			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 2, y: 3}));
+
+			map.placeObject(map.createObject(FIGURE_PROBE_DROID, {x: 2, y: 2}));
+			map.placeObject(map.createObject(FIGURE_IMPERIAL_OFFICER, {x: 4, y: 1}));
 
 			$rootScope.map = map;
 		});
