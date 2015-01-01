@@ -52,52 +52,12 @@
 		function cornerLOS(x, y) {
 			//This function checks if there are two static LOS blocks on both sides of the LOS line.
 
-			//jeżeli sourceY i targetY są większe od Y to nie bierz pod uwagę niczego oprócz Up
-			/*
-			var upBlock = map.getCell(x, y).getEdge(DIR_LEFT).terrain.blocksLOS; //TODO: Doors?
-			var downBlock = map.getCell(x, y-1).getEdge(DIR_LEFT).terrain.blocksLOS;
-			var leftBlock = map.getCell(x-1, y).getEdge(DIR_BOTTOM).terrain.blocksLOS;
-			var rightBlock = map.getCell(x, y).getEdge(DIR_BOTTOM).terrain.blocksLOS;
-
-			var hardBlockedASide = (x1 < x ? upBlock : downBlock) || (y1 < y ? leftBlock : rightBlock);
-			var hardBlockedBSide = (x1 < x ? downBlock : upBlock) || (y1 < y ? rightBlock : leftBlock);
-
-
-			//if x y jest celem to wtedt to:
-			//JAK TO KURDE ZROBIĆ?????
-
-
-			if (sourceCenterY > y && targetCenterY > y) {
-				hardBlockedASide = upBlock;
-				hardBlockedBSide = downBlock || rightBlock || leftBlock;
-			}
-
-			if (sourceCenterY < y && targetCenterY < y) {
-				hardBlockedASide = downBlock;
-				hardBlockedBSide = upBlock || rightBlock || leftBlock;
-			}
-
-			if (sourceCenterX > x && targetCenterX > x) {
-				hardBlockedASide = rightBlock;
-				hardBlockedBSide = downBlock || upBlock || leftBlock;
-			}
-
-			if (sourceCenterX < x && targetCenterX < x) {
-				hardBlockedASide = leftBlock;
-				hardBlockedBSide = upBlock || rightBlock || downBlock;
-			}
-
-			
-			return !(hardBlockedASide && hardBlockedBSide);*/
-
-			/////
 			/////    (0,1)|(1,1)
 			/////    -----+-----
 			/////    (0,0)|(1,0)
 
 			//console.log("Corner (" + x +", " + y + ")");
 		
-
 			var upBlock = map.getCell(x, y).getEdge(DIR_LEFT).terrain.blocksLOS; //TODO: Doors?
 			var downBlock = map.getCell(x, y-1).getEdge(DIR_LEFT).terrain.blocksLOS;
 			var leftBlock = map.getCell(x-1, y).getEdge(DIR_BOTTOM).terrain.blocksLOS;
@@ -275,6 +235,52 @@
 			}
 		}
 		console.log("**** NO LOS ****");
+		return false;
+	};
+
+	IAMap.prototype.isAdjecent = function(sourceX, sourceY, targetX, targetY) {
+		//Is it OK for us to use blocksLOS for adjency checks?
+
+		if (sourceX === targetX && sourceY === targetY) {
+			return false;
+		}
+
+		if (this.getCell(sourceX, sourceY).terrain.blocksLOS ||
+			this.getCell(targetX, targetY).terrain.blocksLOS) {
+			return false;
+		}
+
+		if (Math.abs(sourceX - targetX) + Math.abs(sourceY - targetY) === 1) {
+			var dir = deltaToDir(targetX - sourceX, targetY - sourceY);
+			
+			if (this.getCell(sourceX, sourceY).getEdge(dir).terrain.blocksLOS) {
+				return false;
+			}
+
+			return true;
+		}
+
+		if (Math.abs(sourceX - targetX) === 1 && Math.abs(sourceY - targetY) === 1) {
+			var risingDiag = (sourceX < targetX && sourceY < targetY) || (sourceX > targetX && sourceY > targetY);
+			var x = Math.max(sourceX, targetX);
+			var y = Math.max(sourceY, targetY);
+
+			var upBlock = this.getCell(x, y).getEdge(DIR_LEFT).terrain.blocksLOS; //TODO: Doors?
+			var downBlock = this.getCell(x, y-1).getEdge(DIR_LEFT).terrain.blocksLOS;
+			var leftBlock = this.getCell(x-1, y).getEdge(DIR_BOTTOM).terrain.blocksLOS;
+			var rightBlock = this.getCell(x, y).getEdge(DIR_BOTTOM).terrain.blocksLOS;
+
+			if (risingDiag && (upBlock || leftBlock) && (downBlock || rightBlock)) {
+				return false;
+			}
+
+			if (!risingDiag && (upBlock || rightBlock) && (downBlock || leftBlock)) {
+				return false;
+			}
+
+			return true;
+		}
+
 		return false;
 	};
 })();

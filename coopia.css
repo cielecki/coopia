@@ -82,10 +82,6 @@ h1, h2, h3, h4, h5 {
     background-position: 50% 50% ;
 }
 
-.aid-unit-jyn.aid-los-marker {
-    background-color: #F33;
-}
-
 .aid-los-marker:hover {
     cursor: -webkit-grab;
     cursor: -moz-grab;

@@ -32,7 +32,7 @@
             <div class="aid-map">
                 <div style="position: absolute;" ia-map="map"></div>
 
-                <div ng-repeat="obj in map.objects" class="aid-los-marker aid-unit-{{obj.typeId}}" style="left: {{obj.screenX()}}px; top:{{obj.screenY()}}px;" aid-map-drag="dragCallbackForObj(obj)">
+                <div ng-repeat="obj in map.objects" class="aid-los-marker aid-unit-{{obj.typeId}}" style="left: {{obj.screenX()}}px; top:{{obj.screenY()}}px; background-color: {{obj.ringColor ? obj.ringColor : '#999'}};" aid-map-drag="dragCallbackForObj(obj)">
                     <div class="aid-los-marker-inner" style="background-image: url(images/{{obj.img}});"></div>
                 </div>
             </div>

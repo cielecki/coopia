@@ -13,12 +13,12 @@ angular.module('imperial', ['ui.bootstrap'])
 	};
 
 	$rootScope.availableHeroes = [
-		{typeId: 'gideon_argus', img:'gideon_argus.png', name:'Gideon Argus'},
-		{typeId: 'gaarkhan', img:'gaarkhan.jpg', name:'Gaarkhan'},
-		{typeId: 'jyn_odan', img:'jyn_odan.png', name:'Jyn Odan'},
-		{typeId: 'fenn_signis', img:'fenn_signis.png', name:'Fenn Signis'},
-		{typeId: 'diala_passil', img:'diala_passil.jpg', name:'Diala Passil'},
-		{typeId: 'mak_eshkarey', img:'mak_eshkarey.jpg', name:'Mak Eshka\'rey'}
+		{typeId: 'gideon_argus', img:'gideon_argus.png', name:'Gideon Argus', ringColor: '#F33', isFigure: true,},
+		{typeId: 'gaarkhan', img:'gaarkhan.jpg', name:'Gaarkhan', ringColor: '#F33',isFigure: true,},
+		{typeId: 'jyn_odan', img:'jyn_odan.png', name:'Jyn Odan', ringColor: '#F33',isFigure: true,},
+		{typeId: 'fenn_signis', img:'fenn_signis.png', name:'Fenn Signis', ringColor: '#F33', isFigure: true,},
+		{typeId: 'diala_passil', img:'diala_passil.jpg', name:'Diala Passil', ringColor: '#F33', isFigure: true,},
+		{typeId: 'mak_eshkarey', img:'mak_eshkarey.jpg', name:'Mak Eshka\'rey', ringColor: '#F33', isFigure: true,}
 	];
 
 	$rootScope.selectedHeroes = {gideon_argus: true, gaarkhan: true};
@@ -41,15 +41,18 @@ angular.module('imperial', ['ui.bootstrap'])
 			var map = new IAMap(20, 20);
 			map.load(data);
 
-			var jyn = {typeId: "jyn", x: 3, y: 4, img: 'jyn_odan.png'};
-			var stormtrooper1 = {typeId: "stormtrooper", x:2, y:5, img: 'stormtrooper.png'};
-			var stormtrooper2 = {typeId: "stormtrooper", x:1, y:5, img: 'stormtrooper.png'};
-			var stormtrooper3= {typeId: "stormtrooper", x:3, y:5, img: 'stormtrooper.png'};
-			var units = [jyn, stormtrooper1, stormtrooper2, stormtrooper3];
+			$.each($rootScope.selectedHeroes, function (heroId, selected) {
+				if (selected) {
+					var hero = findinArray($rootScope.availableHeroes, function(hero) { return hero.typeId === heroId; });
+					var heroObj = map.createObject(hero);
+					heroObj.x = 2;
+					heroObj.y = 7;
+					map.placeObject(heroObj);
+				}
+			});
 
-			for (var ui = 0; ui < units.length; ui++) {
-				var figure = map.createObject(units[ui]);
-				map.addObject(figure);
+			for (var ui = 0; ui < 9; ui++) {
+				map.placeObject(map.createObject({typeId: "stormtrooper", x:3, y:3, img: 'stormtrooper.png', isFigure: true}));
 			}
 
 			$rootScope.map = map;
@@ -58,11 +61,9 @@ angular.module('imperial', ['ui.bootstrap'])
 })
 
 .directive('aidMapDrag', function() {
-	console.log('draggeroz');
 	return {
 		restrict: 'A',
 		link: function (scope, element, attrs) {
-			console.log('draggeroz2');
 			var placeCalback = scope.$eval(attrs.aidMapDrag);
 
             var $document = $(document),
@@ -137,9 +138,7 @@ angular.module('imperial', ['ui.bootstrap'])
 				}
 
 				scope.dragCallbackForObj = function(obj) {
-					console.log('dragcb');
 					return function (domElement, x , y) {
-						console.log('dragcb2');
 						map.relocateObject(obj, Math.round(x / CELL_WIDTH), Math.round(map.height - y / CELL_HEIGHT));
 						//checkLos();
 					};

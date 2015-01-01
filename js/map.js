@@ -90,6 +90,68 @@ function IAMap() {
         //check if objects are properly assigned to grid
     };
 
+
+    this.calculateNearestValidPlacementsFor = function(object) {
+        //TODO: verify this
+        //TODO: Big figures
+        //TODO: Verify mobility, impassible etc not only adjency
+
+        if (object.isFigure && this.getCell(object.x,object.y).hasFigure()) {
+            var visited = {};
+            var toVisit = [{x: object.x, y: object.y, distance: 0}];
+            var results = [];
+            var maxDistance = 1000000; //TODO: Should be max number
+
+            var adjecentVisitor = function (adjecentCell) {
+                var adjecent = {x: adjecentCell.x, y: adjecentCell.y, distance: current.distance + 1};
+
+                if (map.isAdjecent(current.x, current.y, adjecent.x, adjecent.y)) {
+                    toVisit.push(adjecent);
+                }
+            };
+
+            while (toVisit.length > 0) {
+                var current = toVisit.pop();
+
+                if (visited[current.x + ":" + current.y] && visited[current.x + ":" + current.y] <= current.distance) {
+                    continue;
+                }
+
+                if (current.distance > maxDistance) {
+                    continue;
+                }
+
+                visited[current.x + ":" + current.y] = current.distance;
+
+                this.getCell(current.x,current.y).visitNeighbouringCells(adjecentVisitor);
+                
+                if (!this.getCell(current.x,current.y).hasFigure()) {
+                    if (maxDistance > current.distance) {
+                        maxDistance = current.distance;
+                        results = [];
+                    }
+                    results.push(current);
+                }
+            }
+
+            return results;
+            //if meets criteria add to results
+        } else {
+            return [{x: object.x, y: object.y}];
+        }
+
+        return [];
+    };
+
+    this.placeObject = function(object) {
+        var placements = this.calculateNearestValidPlacementsFor(object);
+        console.log("placements", object, placements);
+        var placement = randomElementInArray(placements);
+        object.x = placement.x;
+        object.y = placement.y;
+        this.addObject(object);
+    };
+
     this.addObject = function(object) {
         this.objects.push(object);
         visitCellsAndEdgesOfAnObject(object, function(edgeOrCell) {
@@ -127,6 +189,24 @@ function IAMap() {
                 y: y,
                 edges: [null, null, null, null],
                 objects: [],
+                visitNeighbouringCells: function(vistor) {
+                    for (var x = -1; x <= 1; x++) {
+                        for (var y = -1; y <= 1; y++) {
+                            if (x !== 0 || y !== 0) {
+                                vistor(map.getCell(this.x + x, this.y + y));
+                            }
+                        }
+                    }
+                },
+                hasFigure: function () {
+                    for (var i = 0; i < this.objects.length; i++) {
+                        if (this.objects[i].isFigure) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
                 getEdge: function(dir) { return this.edges[dir.index]; }
             };
         }
