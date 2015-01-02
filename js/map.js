@@ -25,8 +25,8 @@ function deltaToDir(x, y) {
 // Other
 ////////////////////////////////////////////////////////////////////////////////
 
-var CELL_WIDTH = 30;
-var CELL_HEIGHT = 30;
+var CELL_WIDTH = 40;
+var CELL_HEIGHT = 40;
 
 var TERRAIN_NORMAL = {cellCssClass: 'aid-map-cell-normal', canMove: true, blocksLOS: false, canMoveIfMobile: true, entryCost: 1, edgeCss:'1px solid #AAA'};
 var TERRAIN_WALL = {cellCssClass: 'aid-map-cell-wall', canMove: false, blocksLOS: true, canMoveIfMobile: false, entryCost: 0, edgeCss:'3px solid #000'};

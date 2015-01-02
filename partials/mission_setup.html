@@ -3,82 +3,34 @@
         <button class="btn btn-default" ng-click="$root.phase = 'intro'">< back</button>
     </div>
 
-    <center><h2>Aftermath Setup</h2></center><br/>
+    <h1>Aftermath</h1>
+    <p>Round: 1</p>
     <div class="row">
         <div class="col-md-6">
-            <h3>1. Assemble Map</h3>
-            <p>Setup the map as shown on the photo:</p>
-            <h3>2. Setup imperial figures and cards</h3>
-            <p>1. Prepare the initial groups as shown on a diagram below.</p>
-            <p>2. Place all figures acording to the map below</p>
-            <h3>3. Read Mission Briefing</h3>
-            <p><em>Arriving at the outpost, you immediatelly open fire upon the troops standing guard.</em></p>
-            <p><em>You susspect that they knew you were coming and that you're likely walking into an ambush. All the same, with the signal continuing to broadcast, there just isn't time for a more subtle approach.</em></p>
-            <ol>
-                <li>A Rebel figure can attack a terminal (Health: 4, Defence: 1 Block). Apply +1 Block to the terminal defence results if it is adjecent to 1 or more imperial figures</li>
-                <li>Doors are locked to Imperial figures</li>
-                <li>The mission ends when all terminals are destroyed (Rebel victory), at the end of Round 6, or when all heroes are wounded.</li>
-            </ol>
-            <h3>4. Deploy Rebel Figures</h3>
-            <p>1. Heroes enter through the enterance. If you decied with a different placement than the default one, update the map below.</p>
-            <p>2. Each hero receives one activation token and places it ready (green side faceup) on his Hero sheet. If playing with fewer than four heroes, they may receive additional activation tokens as specified on their “Legendary” or “Heroic” Reward cards.</p>
-            <h3>5. Prepare Dice, Cards, and Other Tokens.</h3>
-            <p>Place all dice,
-        Condition and Supply decks, damage tokens, strain tokens,
-        and condition tokens within easy reach of all players.</p>
-        </div>
-        <div class="col-md-6">
-            <img src="maps/aftermath.jpg" style="width: 500px;"></img>
-            <div class="aid-map">
-                <div style="position: absolute;" ia-map="map"></div>
+            <div class="aid-map" style=" width: 490px; height: 400px; ">
+                
+                <div style='width: 504px; height: 400px; position: absolute; top: 0px; left: -14px; background-image: url(maps/aftermath.jpg);background-size: 504px 379px; background-repeat: no-repeat;' ng-show="mapDisplay === 'Both' || mapDisplay === 'Ground'"></div>
 
-                <div ng-repeat="obj in map.objects" class="aid-los-marker aid-unit-{{obj.typeId}}" style="left: {{obj.screenX()}}px; top:{{obj.screenY()}}px; background-color: {{obj.ringColor ? obj.ringColor : '#999'}};" aid-map-drag="dragCallbackForObj(obj)">
-                    <div class="aid-los-marker-inner" style="background-image: url(images/{{obj.img}});"></div>
+                <a style='display: block; position: absolute; top: 5px; right: 5px; font-size: 12px;' ng-click="cycleMapDisplay()" href="#">{{mapDisplay}}</a>
+
+                <div style="position:relative">
+                    <div ng-show="mapDisplay === 'Both' || mapDisplay === 'Tactical'" style="position: absolute;" ia-map="map"></div>
+
+                    <div ng-repeat="obj in map.objects" class="aid-los-marker aid-unit-{{obj.typeId}}" style="left: {{obj.screenX()}}px; top:{{obj.screenY()}}px; background-color: {{obj.ringColor ? obj.ringColor : '#999'}};" aid-map-drag="dragCallbackForObj(obj)">
+                        <div class="aid-los-marker-inner" style="background-image: url(images/{{obj.img}});"></div>
+                    </div>
                 </div>
             </div>
+            <p>
+                Imperial groups:
+                <img ng-repeat="group in map.groups" alt="{{group.name}}" ng-src="images/{{group.figureType.img}}" style="width: 40px; height: 40px; border-radius: 50%; margin: 3px; border: 2px #000 solid;" />
+            </p>
+            <p>Threat: 0 (+3 per turn)</p>
         </div>
-
-    </div>
-
-    <hr/>
-
-    <center><h2>Aftermath</h2></center><br/>
-    <p>Threat: 3 (+3 per turn) Round: 5</p>
-    <div ia-map="map"></div>
-    <br/>
-    <br/>
-    Activate a rebel figure and resolve two actions. Click the events below events as they happen. Make sure to update the map before resolving any of those events.<br/>
-    <button class="btn btn-primary" ng-click="$root.phase = 'intro'">Finished rebel activation</button>
-    <button class="btn btn-default" ng-click="$root.phase = 'intro'">Finished all rebel activations</button>
-    <button class="btn btn-default" ng-click="$root.phase = 'intro'">Door opened</button>
-    <button class="btn btn-default" ng-click="$root.phase = 'intro'">All heroes wounded</button>
-    <button class="btn btn-default" ng-click="$root.phase = 'intro'">All terminals destroyed</button>
-
-    <hr/>
-
-    <h3>Status phase</h3>
-    <p>Ready activation tokens</p>
-    <p>End of round effects</p>
-
-    <hr/>
-
-    <h3>Fortified</h3>
-    <p><em>"They'er ..."</em></p>
-    <br/>
-    <p>To be continued ... </p>
-
-    <hr/>
-
-    <h3>Victory!</h3>
-    <p><em>Their plans distrupted, the remaining Imperial forces fall into a hasty retreat. "Nice work!" Your pilot grins back at you as you pile into the transport.</em></p>
-    <br/>
-    <p>To be continued ... </p>
-    
-        <hr/>
-
-    <h3>Defeat!</h3>
-    <p><em>Imperial souldiers pour out of the forest aon all sides; the beacon has done its djob, and you have to run. With so many of the Imperial suroviors getting organized, Rebel ground troops are going to have their hands full.</em></p>
-    <br/>
-    <p>To be continued ... </p>
-    
+        <div class="col-md-6">
+            <div ng-show="events.length > 0">
+                <div ng-include="events[events.length-1].template"></div>
+            </div>
+        </div>
+    </div>    
 </div>

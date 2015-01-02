@@ -37,6 +37,8 @@ angular.module('imperial', ['ui.bootstrap'])
 
 	$rootScope.setupMission = function(missionName) {
 		$rootScope.phase = 'mission_setup';
+        $rootScope.events = [];
+
 		$http.get('/maps/' + missionName + '.map').success(function(data, status, headers, config) {
 			var map = new IAMap(20, 20);
 			map.load(data);
@@ -55,14 +57,25 @@ angular.module('imperial', ['ui.bootstrap'])
 			var FIGURE_PROBE_DROID      = {typeId: "probe", img: 'probe.png', isFigure: true};
 			var FIGURE_IMPERIAL_OFFICER = {typeId: "officer", img: 'officer.png', isFigure: true};
 
-			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 0, y: 2}));
-			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 1, y: 4}));
-			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 2, y: 3}));
+            var stormTrooperGroup = {name:'Stormtrooper', figureType: FIGURE_STORM_TROOPER};
+			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 0, y: 2, group: stormTrooperGroup}));
+			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 1, y: 4, group: stormTrooperGroup}));
+			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 2, y: 3, group: stormTrooperGroup}));
 
-			map.placeObject(map.createObject(FIGURE_PROBE_DROID, {x: 2, y: 2}));
-			map.placeObject(map.createObject(FIGURE_IMPERIAL_OFFICER, {x: 4, y: 1}));
+            var probeGroup = {name:'Probe Droid', figureType: FIGURE_PROBE_DROID};
+			map.placeObject(map.createObject(FIGURE_PROBE_DROID, {x: 2, y: 2, group: probeGroup}));
+
+            var officerGroup = {name:'Imperial officer', figureType: FIGURE_IMPERIAL_OFFICER};
+			map.placeObject(map.createObject(FIGURE_IMPERIAL_OFFICER, {x: 4, y: 1, group: officerGroup}));
+
+            map.groups = [stormTrooperGroup, probeGroup, officerGroup];
 
 			$rootScope.map = map;
+
+            $rootScope.events.push({template: 'partials/event_rebel_activation.html'});
+            $rootScope.events.push({template: 'partials/event_mission_setup_2.html'});
+            $rootScope.events.push({template: 'maps/aftermath_briefing.html'});
+            $rootScope.events.push({template: 'partials/event_mission_setup_1.html'});
 		});
 	};
 })
@@ -225,6 +238,17 @@ angular.module('imperial', ['ui.bootstrap'])
 
 				element.append(mapDiv);
 			}
+
+            scope.mapDisplay = 'Both';
+            scope.cycleMapDisplay = function () {
+                if (scope.mapDisplay === 'Both') {
+                    scope.mapDisplay = 'Tactical';
+                } else if (scope.mapDisplay === 'Tactical') {
+                    scope.mapDisplay = 'Ground';
+                } else if (scope.mapDisplay === 'Ground') {
+                    scope.mapDisplay = 'Both';
+                }
+            };
 
 
 

@@ -1,0 +1,17 @@
+<h3>Rebel Activation</h3>
+
+<p>Activate a rebel figure and resolve two actions. Click the events below events as they happen. Make sure to update the map before resolving any of those events.</p>
+
+<p><button class="btn btn-primary" ng-click="$root.phase = 'intro'">Finished rebel activation</button></p>
+<p><button class="btn btn-default" ng-click="$root.phase = 'intro'">Finished all rebel activations</button></p>
+<p><button class="btn btn-default" ng-click="$root.events.push({template: 'maps/aftermath_event_fortified.html'});">Door opened</button></p>
+<p>
+    <button class="btn btn-default" ng-click="$root.events.push({template: 'maps/aftermath_event_defeat.html'});">
+        All heroes wounded
+    </button>
+</p>
+<p>
+    <button class="btn btn-default" ng-click="$root.events.push({template: 'maps/aftermath_event_victory.html'});">
+        All terminals destroyed
+    </button>
+</p>
