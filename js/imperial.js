@@ -35,6 +35,50 @@ angular.module('imperial', ['ui.bootstrap'])
 		$scope.numHeroes = i;
 	}, true);
 
+    function processImperialActivation() {
+        var map = $rootScope.map;
+        var activeGroups = [];
+
+        $.each(map.groups, function (i, group) {
+            if (group.active)
+                activeGroups.push(group);
+        });
+
+        if (activeGroups.length > 0) {
+            var group = randomElementInArray(activeGroups);
+            group.active = false;
+            $rootScope.events.push({template: 'partials/event_imperial_activation.html', group: group});
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function processStatusPhase() {
+        var map = $rootScope.map;
+
+        $rootScope.round += 1;
+        $rootScope.threat += $rootScope.threatLevel;
+        $rootScope.events.push({template: 'partials/event_status_phase.html'});
+
+        $.each(map.groups, function (i, group) {
+            group.active = true;
+        });
+
+        //deployment
+
+        //end of round hook
+    }
+
+    $rootScope.finishedRebelActivation = function () {
+        processImperialActivation();
+    };
+
+    $rootScope.finishedAllRebelActivations = function () {
+        while (processImperialActivation()) {}
+        processStatusPhase();
+    };
+
 	$rootScope.setupMission = function(missionName) {
 		$rootScope.phase = 'mission_setup';
         $rootScope.events = [];
@@ -57,15 +101,15 @@ angular.module('imperial', ['ui.bootstrap'])
 			var FIGURE_PROBE_DROID      = {typeId: "probe", img: 'probe.png', isFigure: true};
 			var FIGURE_IMPERIAL_OFFICER = {typeId: "officer", img: 'officer.png', isFigure: true};
 
-            var stormTrooperGroup = {name:'Stormtrooper', figureType: FIGURE_STORM_TROOPER};
+            var stormTrooperGroup = {name:'Stormtrooper', figureType: FIGURE_STORM_TROOPER, active: true};
 			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 0, y: 2, group: stormTrooperGroup}));
 			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 1, y: 4, group: stormTrooperGroup}));
 			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 2, y: 3, group: stormTrooperGroup}));
 
-            var probeGroup = {name:'Probe Droid', figureType: FIGURE_PROBE_DROID};
+            var probeGroup = {name:'Probe Droid', figureType: FIGURE_PROBE_DROID, active: true};
 			map.placeObject(map.createObject(FIGURE_PROBE_DROID, {x: 2, y: 2, group: probeGroup}));
 
-            var officerGroup = {name:'Imperial officer', figureType: FIGURE_IMPERIAL_OFFICER};
+            var officerGroup = {name:'Imperial officer', figureType: FIGURE_IMPERIAL_OFFICER, active: true};
 			map.placeObject(map.createObject(FIGURE_IMPERIAL_OFFICER, {x: 4, y: 1, group: officerGroup}));
 
             map.groups = [stormTrooperGroup, probeGroup, officerGroup];
@@ -76,6 +120,10 @@ angular.module('imperial', ['ui.bootstrap'])
             $rootScope.events.push({template: 'partials/event_mission_setup_2.html'});
             $rootScope.events.push({template: 'maps/aftermath_briefing.html'});
             $rootScope.events.push({template: 'partials/event_mission_setup_1.html'});
+
+            $rootScope.round = 1;
+            $rootScope.threat = 0;
+            $rootScope.threatLevel = 3;
 		});
 	};
 })
@@ -255,4 +303,23 @@ angular.module('imperial', ['ui.bootstrap'])
 			scope.$watch(attrs.iaMap, updateMap, false);
 		}
 	};
-});
+})
+
+.directive('aidWith', ['$parse', '$log', function(parse, log) {
+    return {
+        scope: true,
+        link: function(scope, el, attr) {
+            var expression = attr.aidWith;
+            var parts = expression.split(' as ');
+
+            if(parts.length != 2) {
+                log.error("`with` directive expects expression in the form `String as String`");
+                return;
+            }
+
+            scope.$watch(parts[0], function(value) {
+                scope[parts[1]] = value;
+            }, true);
+        }
+    };
+}]);

@@ -2,8 +2,8 @@
 
 <p>Activate a rebel figure and resolve two actions. Click the events below events as they happen. Make sure to update the map before resolving any of those events.</p>
 
-<p><button class="btn btn-primary" ng-click="$root.phase = 'intro'">Finished rebel activation</button></p>
-<p><button class="btn btn-default" ng-click="$root.phase = 'intro'">Finished all rebel activations</button></p>
+<p><button class="btn btn-primary" ng-click="finishedRebelActivation()">Finished rebel activation</button></p>
+<p><button class="btn btn-default" ng-click="finishedAllRebelActivations()">Finished all rebel activations</button></p>
 <p><button class="btn btn-default" ng-click="$root.events.push({template: 'maps/aftermath_event_fortified.html'});">Door opened</button></p>
 <p>
     <button class="btn btn-default" ng-click="$root.events.push({template: 'maps/aftermath_event_defeat.html'});">
