@@ -34,8 +34,9 @@
                     </div>
                 </div>
 
-                <a style='display: block; position: absolute; top: 5px; right: 5px; font-size: 12px;' ng-click="cycleMapDisplay()" href="#">{{mapDisplay}}</a>
+                
             </div>
+            <a style='display: block; font-size: 12px;' ng-click="cycleMapDisplay()" href="#">Show: {{mapDisplay}}</a>
         </div>
         <div class="col-md-6">
             <div ng-if="events.length > 0" aid-with="events[events.length-1] as event">

@@ -1,12 +1,8 @@
-<h3>1. Assemble Map</h3>
-<p>Setup the map as shown on the photo:</p>
-<h3>2. Setup imperial figures and cards</h3>
-<p>1. Prepare the initial groups:</p>
-<ul>
-    <li ng-repeat="group in map.groups">{{group.name}}</li>
-</ul>
-<p>2. Place all figures acording to the map below</p>
-
-
+<h3>Setup</h3>
+<ol>
+    <li>Assemble the physical map as shown on the left</li>
+    <li>Place the figures and tokens on the physical map</li>
+    <li>Prepare cards for the following groups: <span ng-repeat="group in map.groups">{{group.name}}<span ng-show="!$last">,</span></span>.</li>
+</ol>
 
 <button class="btn btn-primary" ng-click="events.pop()">Next</button>
