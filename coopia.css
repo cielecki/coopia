@@ -80,11 +80,10 @@ h1, h2, h3, h4, h5 {
     background-position: 50% 50% ;
 }
 
-.aid-los-marker:hover {
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
+.aid-los-marker:hover, .aid-object-token:hover {
+    cursor: pointer;
 }
-.aid-los-marker:active {
+.aid-los-marker:active, .aid-object-token:active {
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
     z-index: 6;

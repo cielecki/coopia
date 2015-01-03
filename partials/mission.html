@@ -1,18 +1,16 @@
 <div ng-show="phase == 'mission_setup'">
-    <div class="flow-buttons">
-        <button class="btn btn-default" ng-click="$root.phase = 'intro'">< back</button>
-    </div>
-
-    <h1>Aftermath</h1>
     <div class="row">
-        <div class="col-md-3">Round: {{round}}</div>
-        <div class="col-md-3">Threat: {{threat}} (+{{threatLevel}} per turn)
+        <div class="col-md-3" style='height: 70px;'><h1>Aftermath</h1></div>
+        <div class="col-md-3" style="height: 70px;"><div style="position: absolute; bottom: 12px;">Round: {{round}}</div></div>
+        <div class="col-md-3" style="height: 70px;"><div style="position: absolute; bottom: 12px;">Threat: {{threat}} (+{{threatLevel}} per turn)</div>
         </div>
-        <div class="col-md-6">Imperial groups: <img ng-repeat="group in map.groups" alt="{{group.name}}" ng-src="images/{{group.figureType.img}}" style="width: 20px; height: 20px; border-radius: 50%; margin: 3px; border: 2px #000 solid;" ng-style="{'opacity': group.active ? 1.0 : 0.25}"/>
+        <div class="col-md-3" style="height: 70px;"><div style="position: absolute; bottom: 12px; text-align: right; width: 100%">Imperial groups: <img ng-repeat="group in map.groups" alt="{{group.name}}" ng-src="images/{{group.figureType.img}}" style="width: 20px; height: 20px; border-radius: 50%; margin: 3px; border: 2px #000 solid;" ng-style="{'opacity': group.active ? 1.0 : 0.25}"/></div>
         </div>
     </div>
+    <hr/>
     <div class="row">
         <div class="col-md-6">
+            <h3 style='display: block; font-size: 12px;'><a ng-click="cycleMapDisplay()" href="#">Show: {{mapDisplay}}</a></h3>
             <div class="aid-map" style="height: {{map.cssHeight}}px; ">
                 <div class="aid-map-ground" ng-style='missionInfo.groundStyle' ng-show="mapDisplay === 'Both' || mapDisplay === 'Ground'"></div>
 
@@ -23,23 +21,33 @@
                          ng-if="obj.isFigure"
                          class="aid-los-marker aid-unit-{{obj.typeId}}"
                          style="left: {{obj.screenX()}}px; bottom:{{obj.screenY()}}px; margin: 2px; width: {{map.cellCssWidth - 2 * 2 }}px; height: {{map.cellCssHeight - 2 * 2 }}px; background-color: {{obj.ringColor ? obj.ringColor : '#999'}};"
-                         aid-map-drag="dragCallbackForObj(obj)">
+                         aid-map-drag="dragCallbackForObj(obj)"
+                         ng-click="map.selectObject(obj)">
                             <div class="aid-los-marker-inner" style="background-image: url(images/{{obj.img}}); width: {{map.cellCssWidth - 2 * 5 }}px; height: {{map.cellCssHeight - 2 * 5 }}px; "></div>
                     </div>
                     <div ng-repeat-end
                          ng-if="!obj.isFigure"
                          class="aid-object-token"
                          ng-style="{width: (obj.width === 0 ? map.cellCssWidth/4 : map.cellCssWidth * obj.width) + 'px', height: (obj.height === 0 ? map.cellCssHeight/4 : map.cellCssHeight * obj.height) + 'px', 'background-size': (obj.width === 0 ? map.cellCssWidth/4 : map.cellCssWidth * obj.width) + 'px ' + (obj.height === 0 ? map.cellCssHeight/4 : map.cellCssHeight * obj.height) + 'px', left: obj.screenX() + 'px', bottom: obj.screenY() + 'px', 'background-image': 'url(images/' + obj.img +')'}"
-                         aid-map-drag="dragCallbackForObj(obj)">
+                         aid-map-drag="dragCallbackForObj(obj)"
+                         ng-click="map.selectObject(obj)">
                     </div>
-                </div>
-
-                
+                </div>                
             </div>
-            <a style='display: block; font-size: 12px;' ng-click="cycleMapDisplay()" href="#">Show: {{mapDisplay}}</a>
+            
         </div>
         <div class="col-md-6">
-            <div ng-if="events.length > 0" aid-with="events[events.length-1] as event">
+            <div ng-if="map.selectedObject" style="height: {{map.cssHeight}}px; border-radius: 10px; background-color: #d0e1ca; padding: 5px; border: 3px #5c975a solid;">
+                <h3 style='margin: 0px; display: block; font-size: 20px;float: right; display: block; width: 30px;text-align: right;'><a style='color: #5c975a; text-decoration: none;' href="#" ng-click="map.selectedObject = null">x</a></h3>
+                <h3 style='margin: 0px;'><img ng-src="images/{{map.selectedObject.img}}" style='width:48px; height: 48px;'></img> {{map.selectedObject.name}}</h3><br/>
+
+                <div ng-if="map.selectedObject.isHero">
+                    <p><span ng-if="map.selectedObject.isWounded">Wounded</span><span ng-if="!map.selectedObject.isWounded">Healthy <button class="btn btn-default" ng-click="map.woundHero(map.selectedObject)">Mark as wounded</button></span></p>
+                </div>
+
+                <button class="btn btn-default" ng-click="map.removePermanently(map.selectedObject)">Remove from the game</button>
+            </div>
+            <div ng-if="!map.selectedObject &amp;&amp; events.length > 0" aid-with="events[events.length-1] as event">
                 <div ng-include="event.template"></div>
             </div>
         </div>

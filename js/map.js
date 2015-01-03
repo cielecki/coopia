@@ -36,8 +36,10 @@ var TERRAIN_IMPASSIBLE = {cellCssClass: 'aid-map-cell-impassible',canMove: false
 var TERRAIN_BLOCKED = {cellCssClass: 'aid-map-cell-blocked', canMove: false, blocksLOS: true, canMoveIfMobile: true, entryCost: 1, edgeCss:'1px solid #F00'};
 var TERRAIN_DIFFICULT = {cellCssClass: 'aid-map-cell-difficult', canMove: true, blocksLOS: false, canMoveIfMobile: true, entryCost: 2, edgeCss:'1px solid #00F'};
 
-function IAMap() {
+function IAMap(missionInfo) {
     var map = this;
+
+    this.missionInfo = missionInfo;
 
     this.createObject = function (objectType, instanceInfo) {
         var obj = {};
@@ -175,6 +177,29 @@ function IAMap() {
         visitCellsAndEdgesOfAnObject(object, function(edgeOrCell) {
             removeElementFromArray(edgeOrCell.objects, object);
         });
+    };
+
+    this.woundHero = function(obj) {
+        obj.isWounded = true;
+
+        if (missionInfo.onHeroWounded) {
+            missionInfo.onHeroWounded(obj);
+        }
+    };
+
+    this.selectObject = function(obj) {
+        this.selectedObject = obj;
+    };
+
+    this.removePermanently = function(object) {
+        if (this.selectedObject === object) {
+            this.selectedObject = null;
+        }
+
+        this.removeObject(object);
+        if (object.onRemovePermanently) {
+            object.onRemovePermanently();
+        }
     };
 
     this.relocateObject = function(object, newX, newY) {
