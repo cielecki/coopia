@@ -1,4 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
+// Missions
+////////////////////////////////////////////////////////////////////////////////
+var MISSIONS_DICT = {};
+
+////////////////////////////////////////////////////////////////////////////////
 // Direction
 ////////////////////////////////////////////////////////////////////////////////
 var DIR_TOP = {index: 0, deltaX: 0, deltaY: 1, cssName: 'top'};
@@ -24,9 +29,6 @@ function deltaToDir(x, y) {
 ////////////////////////////////////////////////////////////////////////////////
 // Other
 ////////////////////////////////////////////////////////////////////////////////
-
-var CELL_WIDTH = 40;
-var CELL_HEIGHT = 40;
 
 var TERRAIN_NORMAL = {cellCssClass: 'aid-map-cell-normal', canMove: true, blocksLOS: false, canMoveIfMobile: true, entryCost: 1, edgeCss:'1px solid #AAA'};
 var TERRAIN_WALL = {cellCssClass: 'aid-map-cell-wall', canMove: false, blocksLOS: true, canMoveIfMobile: false, entryCost: 0, edgeCss:'3px solid #000'};
@@ -55,8 +57,8 @@ function IAMap() {
         obj.isStunned = false;
         obj.img = '';
 
-        obj.screenX = function () { return CELL_WIDTH * this.x; };
-        obj.screenY = function () { return CELL_HEIGHT * (map.height - this.y); };
+        obj.screenX = function () { return map.cellCssWidth * this.x; };
+        obj.screenY = function () { return map.cellCssHeight * this.y; };
 
         if (objectType)
             for (var k in objectType)
@@ -181,13 +183,20 @@ function IAMap() {
         this.removeObject(object);
         object.x = newX;
         object.y = newY;
-        this.addObject(object);
+        this.placeObject(object);
     };
 
     this.init = function (width, height) {
         this.width = width;
         this.height = height;
+
+        this.cssWidth = 555;
+        this.cellCssWidth = Math.floor(this.cssWidth/width);
+        this.cellCssHeight = this.cellCssWidth;
+        this.cssHeight = height * this.cellCssHeight;
+
         this.objects = [];
+        this.groups = [];
 
         function createUnconnectedCell(x, y) {
             return {

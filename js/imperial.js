@@ -79,51 +79,34 @@ angular.module('imperial', ['ui.bootstrap'])
         processStatusPhase();
     };
 
-	$rootScope.setupMission = function(missionName) {
+	$rootScope.setupMission = function(missionId) {
 		$rootScope.phase = 'mission_setup';
         $rootScope.events = [];
 
-		$http.get('/maps/' + missionName + '.map').success(function(data, status, headers, config) {
-			var map = new IAMap(20, 20);
+        var missionInfo = MISSIONS_DICT[missionId];
+
+		$http.get(missionInfo.mapUrl).success(function(data, status, headers, config) {
+			var map = new IAMap();
+
 			map.load(data);
 
-			$.each($rootScope.selectedHeroes, function (heroId, selected) {
-				if (selected) {
-					var hero = findinArray($rootScope.availableHeroes, function(hero) { return hero.typeId === heroId; });
-					var heroObj = map.createObject(hero);
-					heroObj.x = 2;
-					heroObj.y = 7;
-					map.placeObject(heroObj);
-				}
-			});
-
-			var FIGURE_STORM_TROOPER    = {typeId: "stormtrooper", img: 'stormtrooper.png', isFigure: true};
-			var FIGURE_PROBE_DROID      = {typeId: "probe", img: 'probe.png', isFigure: true};
-			var FIGURE_IMPERIAL_OFFICER = {typeId: "officer", img: 'officer.png', isFigure: true};
-
-            var stormTrooperGroup = {name:'Stormtrooper', figureType: FIGURE_STORM_TROOPER, active: true};
-			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 0, y: 2, group: stormTrooperGroup}));
-			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 1, y: 4, group: stormTrooperGroup}));
-			map.placeObject(map.createObject(FIGURE_STORM_TROOPER, {x: 2, y: 3, group: stormTrooperGroup}));
-
-            var probeGroup = {name:'Probe Droid', figureType: FIGURE_PROBE_DROID, active: true};
-			map.placeObject(map.createObject(FIGURE_PROBE_DROID, {x: 2, y: 2, group: probeGroup}));
-
-            var officerGroup = {name:'Imperial officer', figureType: FIGURE_IMPERIAL_OFFICER, active: true};
-			map.placeObject(map.createObject(FIGURE_IMPERIAL_OFFICER, {x: 4, y: 1, group: officerGroup}));
-
-            map.groups = [stormTrooperGroup, probeGroup, officerGroup];
-
-			$rootScope.map = map;
-
-            $rootScope.events.push({template: 'partials/event_rebel_activation.html'});
-            $rootScope.events.push({template: 'partials/event_mission_setup_2.html'});
-            $rootScope.events.push({template: 'maps/aftermath_briefing.html'});
-            $rootScope.events.push({template: 'partials/event_mission_setup_1.html'});
-
+            $rootScope.missionInfo = missionInfo;
             $rootScope.round = 1;
             $rootScope.threat = 0;
             $rootScope.threatLevel = 3;
+            $rootScope.map = map;
+
+            $.each($rootScope.selectedHeroes, function (heroId, selected) {
+                if (selected) {
+                    var hero = findinArray($rootScope.availableHeroes, function(hero) { return hero.typeId === heroId; });
+                    var heroObj = map.createObject(hero);
+                    heroObj.x = missionInfo.heroStart.x;
+                    heroObj.y = missionInfo.heroStart.y;
+                    map.placeObject(heroObj);
+                }
+            });
+
+            missionInfo.setup($rootScope);
 		});
 	};
 })
@@ -207,15 +190,14 @@ angular.module('imperial', ['ui.bootstrap'])
 
 				scope.dragCallbackForObj = function(obj) {
 					return function (domElement, x , y) {
-						map.relocateObject(obj, Math.round(x / CELL_WIDTH), Math.round(map.height - y / CELL_HEIGHT));
+						map.relocateObject(obj, Math.round(x / map.cellCssWidth), Math.round(map.height - y / map.cellCssHeight) - 1);
 						//checkLos();
 					};
 				};
 				
-				console.log('map', map, map.height);
-
 				var mapDiv = $('<div class="aid-map">');
-				mapDiv.css('height', CELL_HEIGHT * map.height);
+				mapDiv.css('height', map.cssHeight);
+                mapDiv.css('width', map.cssWidth);
 
 				/*
 				function addClicker(cellDiv, x, y) {
@@ -235,14 +217,15 @@ angular.module('imperial', ['ui.bootstrap'])
 				}*/
 
 				for (var y = 0; y < map.height; y++) {
-					var row = $('<div class="aid-map-row">');
 
 					for (var x = 0; x < map.width; x++) {
 						var cellDiv = $('<div class="aid-map-cell">');
 						var cell = map.getCell(x, y);
 						cellDiv.addClass(cell.terrain.cellCssClass);
-						cellDiv.css("left", CELL_WIDTH * x);
-						cellDiv.css("top", CELL_HEIGHT * (map.height-y));
+                        cellDiv.css("width", map.cellCssWidth);
+                        cellDiv.css("height", map.cellCssHeight);
+						cellDiv.css("left", map.cellCssWidth * x);
+						cellDiv.css("bottom", map.cellCssHeight * y);
 
 						//borders
 						for (var i in DIRS) {
@@ -255,11 +238,9 @@ angular.module('imperial', ['ui.bootstrap'])
 						}
 						
 						//addClicker(cellDiv, x, y);
-						row.append(cellDiv);
+						mapDiv.append(cellDiv);
 						cell.domElement = cellDiv;
 					}
-
-					mapDiv.append(row);
 				}
 
 				/*

@@ -35,10 +35,7 @@ h1, h2, h3, h4, h5 {
 
 .aid-map-cell {
     position: absolute;
-    width: 40px;
-    height: 40px;
-    opacity: 0.5;
-    
+    opacity: 0.5;    
     border: 1px #FFF solid;
 }
 
@@ -56,28 +53,30 @@ h1, h2, h3, h4, h5 {
 }
 
 .aid-los-marker {
-    margin: 2px;
-    width: 36px;
-    height: 36px;
+    border: 1px #FFF solid;
     background-color: #333;
     position: absolute;
     text-align: center;
     vertical-align: middle;
     border-radius: 50%;
-    border: 1px #FFF solid;
+    z-index: 5;
+}
 
+.aid-object-token {
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    background-repeat: no-repeat;
 }
 
 .aid-los-marker-inner {
     margin: 2px;
-    width: 30px;
-    height: 30px;
+    background-size: 100% 100%;
     background-color: #CCC;
     text-align: center;
     vertical-align: middle;
     border-radius: 50%;
     border: 1px #FFF solid;
-    background-size: 32px 32px;
     background-position: 50% 50% ;
 }
 
@@ -88,9 +87,18 @@ h1, h2, h3, h4, h5 {
 .aid-los-marker:active {
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
-    z-index: 2;
+    z-index: 6;
 }
 
 .aid-los-marker.aid-visible {
     background-color: #0F0;
+}
+
+.aid-map-ground {
+    position: absolute;
+    background-repeat: no-repeat;
+}
+
+.aid-map-tactical {
+    position: absolute;
 }

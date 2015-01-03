@@ -1,0 +1,46 @@
+<div ng-show="phase == 'mission_setup'">
+    <div class="flow-buttons">
+        <button class="btn btn-default" ng-click="$root.phase = 'intro'">< back</button>
+    </div>
+
+    <h1>Aftermath</h1>
+    <div class="row">
+        <div class="col-md-3">Round: {{round}}</div>
+        <div class="col-md-3">Threat: {{threat}} (+{{threatLevel}} per turn)
+        </div>
+        <div class="col-md-6">Imperial groups: <img ng-repeat="group in map.groups" alt="{{group.name}}" ng-src="images/{{group.figureType.img}}" style="width: 20px; height: 20px; border-radius: 50%; margin: 3px; border: 2px #000 solid;" ng-style="{'opacity': group.active ? 1.0 : 0.25}"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="aid-map" style="height: {{map.cssHeight}}px; ">
+                <div class="aid-map-ground" ng-style='missionInfo.groundStyle' ng-show="mapDisplay === 'Both' || mapDisplay === 'Ground'"></div>
+
+                <div class="aid-map-tactical" style="height: {{map.cssHeight}}px; ">
+                    <div ng-show="mapDisplay === 'Both' || mapDisplay === 'Tactical'" style="position: absolute;" ia-map="map"></div>
+
+                    <div ng-repeat-start="obj in map.objects"
+                         ng-if="obj.isFigure"
+                         class="aid-los-marker aid-unit-{{obj.typeId}}"
+                         style="left: {{obj.screenX()}}px; bottom:{{obj.screenY()}}px; margin: 2px; width: {{map.cellCssWidth - 2 * 2 }}px; height: {{map.cellCssHeight - 2 * 2 }}px; background-color: {{obj.ringColor ? obj.ringColor : '#999'}};"
+                         aid-map-drag="dragCallbackForObj(obj)">
+                            <div class="aid-los-marker-inner" style="background-image: url(images/{{obj.img}}); width: {{map.cellCssWidth - 2 * 5 }}px; height: {{map.cellCssHeight - 2 * 5 }}px; "></div>
+                    </div>
+                    <div ng-repeat-end
+                         ng-if="!obj.isFigure"
+                         class="aid-object-token"
+                         ng-style="{width: (obj.width === 0 ? map.cellCssWidth/4 : map.cellCssWidth * obj.width) + 'px', height: (obj.height === 0 ? map.cellCssHeight/4 : map.cellCssHeight * obj.height) + 'px', 'background-size': (obj.width === 0 ? map.cellCssWidth/4 : map.cellCssWidth * obj.width) + 'px ' + (obj.height === 0 ? map.cellCssHeight/4 : map.cellCssHeight * obj.height) + 'px', left: obj.screenX() + 'px', bottom: obj.screenY() + 'px', 'background-image': 'url(images/' + obj.img +')'}"
+                         aid-map-drag="dragCallbackForObj(obj)">
+                    </div>
+                </div>
+
+                <a style='display: block; position: absolute; top: 5px; right: 5px; font-size: 12px;' ng-click="cycleMapDisplay()" href="#">{{mapDisplay}}</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div ng-if="events.length > 0" aid-with="events[events.length-1] as event">
+                <div ng-include="event.template"></div>
+            </div>
+        </div>
+    </div>
+</div>
